@@ -33,7 +33,7 @@ composer require forumaker/profile-cover:"*"
 - [GitHub Repository](https://github.com/forumaker/profile-cover)
 - [Packagist](https://packagist.org/packages/forumaker/profile-cover)
 - [Extiverse](https://extiverse.com/extension/forumaker/profile-cover)
-- [Discuss](https://discuss.flarum.org/)
+- [Discuss](https://discuss.flarum.org/d/39144-profile-cover-thumbnails-and-gif-support)
 
 
 Fork of [sycho/flarum-profile-cover](https://github.com/SychO9/flarum-profile-cover) with GIF and WebP support and improved thumbnails
