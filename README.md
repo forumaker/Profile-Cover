@@ -9,6 +9,12 @@ Adds the ability to upload a cover image to a profile. **Supports Flarum 2.x onl
 - ⚙️ Configurable max file size in admin panel
 
 
+## 📸 Screenshots
+<img width="1300" height="280" alt="image" src="https://github.com/user-attachments/assets/ca3c7d55-7e86-4d27-87b4-d5c50797c3fd" />
+<img width="1300" height="170" alt="image" src="https://github.com/user-attachments/assets/c6a07c0f-f4aa-4acc-9f6a-1ded845a0409" />
+
+
+
 ## 📦 Installation
 Run this in your Flarum root directory:
 ```
