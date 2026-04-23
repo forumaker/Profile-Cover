@@ -1,0 +1,149 @@
+import Form from 'flarum/common/components/Form';
+import app from 'flarum/forum/app';
+import Modal from 'flarum/common/components/Modal';
+import Button from 'flarum/common/components/Button';
+import ItemList from 'flarum/common/utils/ItemList';
+import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
+import formatBytes from '../../common/formatBytes';
+
+export default class CoverEditorModal extends Modal {
+  maxSize!: number;
+  alertAttrs!: { content: string; type?: string };
+  loading!: boolean;
+  cover!: string | null;
+  context!: string;
+
+  oninit(vnode: any) {
+    super.oninit(vnode);
+
+    this.maxSize = parseFloat(app.forum.attribute('forumaker-profile-cover.max_size') || 2048);
+
+    this.alertAttrs = {
+      content: app.translator.trans('forumaker-profile-cover.forum.notice', {
+        size: formatBytes(this.maxSize * Math.pow(2, 10)),
+      }) as string,
+    };
+
+    this.loading = false;
+    this.cover = this.attrs.user.cover_thumbnail() || this.attrs.user.cover();
+    this.context = '';
+  }
+
+  content() {
+    const attrs: Record<string, any> = {};
+    let className = 'Modal-image CoverEditor-cover';
+
+    if (this.cover) {
+      attrs.style = { backgroundImage: `url(${this.cover})` };
+      className += ' CoverEditor-active';
+    }
+
+    return [
+      <div className={className} {...attrs}>
+        {this.loading ? <LoadingIndicator /> : ''}
+      </div>,
+
+      <div className="Modal-body">
+        <Form className="Form--centered">{this.fieldsItems().toArray()}</Form>
+      </div>,
+    ];
+  }
+
+  className() {
+    return 'Cover-modal Modal--small';
+  }
+
+  title() {
+    return app.translator.trans('forumaker-profile-cover.forum.edit_cover');
+  }
+
+  fieldsItems() {
+    const items = new ItemList();
+    items.add('actions', this.controlItems().toArray());
+    return items;
+  }
+
+  controlItems() {
+    const items = new ItemList();
+
+    items.add(
+      'upload',
+      <Button icon="fas fa-upload" className="Button Button--block Button--primary" onclick={this.openPicker.bind(this)}>
+        {app.translator.trans('core.forum.user.avatar_upload_button')}
+      </Button>
+    );
+
+    items.add(
+      'remove',
+      <Button icon="fas fa-times" className="Button Button--block" onclick={this.remove.bind(this)}>
+        {app.translator.trans('core.forum.user.avatar_remove_button')}
+      </Button>
+    );
+
+    return items;
+  }
+
+  openPicker() {
+    const input = $('<input type="file" accept="image/jpeg,image/png,image/gif,image/bmp,image/webp">');
+
+    input
+      .appendTo('body')
+      .hide()
+      .click()
+      .on('change', (e) => {
+        this.upload(($(e.target)[0] as HTMLInputElement).files![0]);
+      });
+  }
+
+  upload(file: File) {
+    if (this.loading) return;
+
+    const data = new FormData();
+    data.append('cover', file);
+
+    this.loading = true;
+    this.context = 'added';
+    m.redraw();
+
+    app
+      .request({
+        method: 'POST',
+        url: `${app.forum.attribute('apiUrl')}/users/${this.attrs.user.id()}/cover`,
+        serialize: (raw: any) => raw,
+        body: data,
+      })
+      .then(this.success.bind(this), this.failure.bind(this));
+  }
+
+  remove() {
+    this.loading = true;
+    this.context = 'removed';
+    m.redraw();
+
+    app
+      .request({
+        method: 'DELETE',
+        url: `${app.forum.attribute('apiUrl')}/users/${this.attrs.user.id()}/cover`,
+      })
+      .then(this.success.bind(this), this.failure.bind(this));
+  }
+
+  success(response: any) {
+    app.store.pushPayload(response);
+    this.showAlert('success');
+    this.loading = false;
+    m.redraw();
+    this.hide();
+  }
+
+  failure() {
+    this.showAlert('error');
+    this.loading = false;
+    m.redraw();
+  }
+
+  showAlert(type: string) {
+    this.alertAttrs.content = app.translator.trans(`forumaker-profile-cover.forum.${this.context}.${type}`) as string;
+    this.alertAttrs.type = type;
+  }
+}

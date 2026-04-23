@@ -1,0 +1,45 @@
+{
+  "name": "forumaker/profile-cover",
+  "description": "Adds the ability to upload a cover image to a profile",
+  "type": "flarum-extension",
+  "keywords": ["flarum", "flarum-extension", "profile", "cover", "image", "gif"],
+  "license": "MIT",
+  "homepage": "https://github.com/forumaker/profile-cover",
+  "support": {
+    "issues": "https://github.com/forumaker/profile-cover/issues",
+    "source": "https://github.com/forumaker/profile-cover"
+  },
+  "authors": [
+    {
+      "name": "forumaker",
+      "role": "Developer",
+      "homepage": "https://github.com/forumaker"
+    }
+  ],
+  "require": {
+    "php": ">=8.2",
+    "flarum/core": "^2.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Forumaker\\ProfileCover\\": "src/"
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-2.x": "2.x-dev"
+    },
+    "flarum-extension": {
+      "title": "Profile Cover",
+      "category": "feature",
+      "icon": {
+        "name": "fas fa-image",
+        "backgroundColor": "#117187",
+        "color": "#fff"
+      }
+    }
+  },
+  "config": {
+    "sort-packages": true
+  }
+}
