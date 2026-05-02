@@ -10,7 +10,7 @@ Adds the ability to upload a cover image to a profile. **Supports Flarum 2.x onl
 
 
 ## 📸 Screenshots
-<img width="1300" height="280" alt="image" src="https://github.com/user-attachments/assets/ca3c7d55-7e86-4d27-87b4-d5c50797c3fd" />
+<img width="1230" height="650" alt="Profile" src="https://github.com/user-attachments/assets/9cd9f6f3-855c-40f9-a8d0-d70261edabfe" />
 <img width="1300" height="170" alt="image" src="https://github.com/user-attachments/assets/c6a07c0f-f4aa-4acc-9f6a-1ded845a0409" />
 
 
