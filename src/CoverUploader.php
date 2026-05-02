@@ -27,17 +27,17 @@ class CoverUploader
         }
 
         $encodedImage = $image->toJpg();
-        $coverPath = Str::random() . '.jpg';
+        $coverPath    = Str::random() . '.jpg';
 
         $this->remove($user);
         $user->cover = $coverPath;
 
         if ($makeThumb) {
-            $thumbnail = clone $image;
+            $thumbWidth    = (int) $this->config->get('forumaker-profile-cover.thumbnail_width', 500);
+            $thumbnail     = clone $image;
             $thumbnailPath = 'thumbnails/' . $coverPath;
 
-            // Scale proportionally — no crop
-            $thumbnail->scale(500);
+            $thumbnail->scale($thumbWidth);
             $encodedThumbnail = $thumbnail->toJpg();
 
             $this->coversDir->put($thumbnailPath, $encodedThumbnail);

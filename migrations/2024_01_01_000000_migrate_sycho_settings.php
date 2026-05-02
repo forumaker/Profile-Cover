@@ -2,10 +2,6 @@
 
 use Illuminate\Database\Schema\Builder;
 
-/**
- * Migrate settings from sycho/flarum-profile-cover to forumaker/profile-cover.
- * Safe to run even if the old extension was never installed.
- */
 return [
     'up' => function (Builder $schema) {
         $db = $schema->getConnection();
@@ -16,7 +12,6 @@ return [
             $oldKey = 'sycho-profile-cover.' . $key;
             $newKey = 'forumaker-profile-cover.' . $key;
 
-            // Skip if new key already has a value
             $exists = $db->table('settings')->where('key', $newKey)->exists();
             if ($exists) continue;
 
@@ -27,7 +22,5 @@ return [
         }
     },
 
-    'down' => function (Builder $schema) {
-        // Nothing to reverse — we don't delete old sycho settings
-    },
+    'down' => function (Builder $schema) {},
 ];

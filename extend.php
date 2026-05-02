@@ -5,6 +5,7 @@ use Flarum\Foundation\Paths;
 use Flarum\Http\UrlGenerator;
 use Flarum\User\User;
 use Forumaker\ProfileCover\Access\UserPolicy;
+use Forumaker\ProfileCover\Api\ThumbnailActionsController;
 use Forumaker\ProfileCover\Api\UserResourceEndpoints;
 use Forumaker\ProfileCover\Api\UserResourceFields;
 
@@ -35,8 +36,19 @@ return [
     (new Extend\Filesystem())
         ->disk('forumaker-profile-cover', function (Paths $paths, UrlGenerator $url) {
             return [
-                'root' => "$paths->public/assets/covers",
-                'url'  => $url->to('forum')->path('assets/covers'),
+                'root'        => "$paths->public/assets/covers",
+                'url'         => $url->to('forum')->path('assets/covers'),
+                'permissions' => [
+                    'dir'  => ['public' => 0755, 'private' => 0700],
+                    'file' => ['public' => 0644, 'private' => 0600],
+                ],
             ];
         }),
+
+    (new Extend\Routes('api'))
+        ->post(
+            '/forumaker-profile-cover/thumbnails/{action}',
+            'forumaker-profile-cover.thumbnails',
+            ThumbnailActionsController::class
+        ),
 ];

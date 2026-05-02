@@ -1,6 +1,7 @@
 import app from 'flarum/forum/app';
 import { extend } from 'flarum/common/extend';
 import UserCard from 'flarum/forum/components/UserCard';
+import UserPage from 'flarum/forum/components/UserPage';
 import UserControls from 'flarum/forum/utils/UserControls';
 import Button from 'flarum/common/components/Button';
 import type Mithril from 'mithril';
@@ -12,17 +13,16 @@ app.initializers.add('forumaker-profile-cover', () => {
   extend(UserCard.prototype, 'view', function (view: Mithril.Vnode) {
     if (!view.attrs.style || !this.attrs.user.cover()) return;
 
-    let coverUrl = this.attrs.user.cover();
-    let thumbnailUrl = this.attrs.user.cover_thumbnail();
+    const coverUrl     = this.attrs.user.cover();
+    const thumbnailUrl = this.attrs.user.cover_thumbnail();
 
     if (!coverUrl) return;
 
-    if (this.attrs.controlsButtonClassName.includes('Button--icon') && thumbnailUrl) {
-      coverUrl = thumbnailUrl;
-    }
+    const isProfilePage = app.current.matches(UserPage);
+    const imageUrl      = (!isProfilePage && thumbnailUrl) ? thumbnailUrl : coverUrl;
 
     view.attrs.style = Object.assign(view.attrs.style, {
-      '--background-image': `url(${coverUrl})`,
+      '--background-image': `url(${imageUrl})`,
     });
   });
 
