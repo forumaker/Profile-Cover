@@ -11,6 +11,9 @@ Adds the ability to upload a cover image to a profile. **Supports Flarum 2.x onl
 
 ## 📸 Screenshots
 <img width="1230" height="650" alt="Profile" src="https://github.com/user-attachments/assets/9cd9f6f3-855c-40f9-a8d0-d70261edabfe" />
+
+___
+
 <img width="1300" height="170" alt="image" src="https://github.com/user-attachments/assets/c6a07c0f-f4aa-4acc-9f6a-1ded845a0409" />
 
 
@@ -32,7 +35,6 @@ composer require forumaker/profile-cover:"*"
 ## 🔗 Links
 - [GitHub Repository](https://github.com/forumaker/profile-cover)
 - [Packagist](https://packagist.org/packages/forumaker/profile-cover)
-- [Extiverse](https://extiverse.com/extension/forumaker/profile-cover)
 - [Discuss](https://discuss.flarum.org/d/39144-profile-cover-thumbnails-and-gif-support)
 
 

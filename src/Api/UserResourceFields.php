@@ -36,7 +36,6 @@ class UserResourceFields
             return null;
         }
 
-        // GIFs have no thumbnail — return cover URL directly
         if (str_ends_with(strtolower($imageName), '.gif')) {
             return $this->coversDir->url($imageName);
         }
@@ -47,7 +46,6 @@ class UserResourceFields
             return $this->coversDir->url($thumbnailName);
         }
 
-        // Thumbnail not generated yet — fall back to full cover
         return $this->coversDir->url($imageName);
     }
 }

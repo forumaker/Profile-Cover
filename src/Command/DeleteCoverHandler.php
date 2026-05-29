@@ -16,7 +16,6 @@ class DeleteCoverHandler
         protected UserRepository $users,
         protected CoverUploader $uploader
     ) {
-        $this->events = $events;
     }
 
     public function handle(DeleteCover $command)

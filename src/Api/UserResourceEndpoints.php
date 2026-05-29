@@ -5,7 +5,6 @@ namespace Forumaker\ProfileCover\Api;
 use Flarum\Api\Context;
 use Flarum\Api\Endpoint;
 use Flarum\Bus\Dispatcher;
-use Illuminate\Support\Arr;
 use Forumaker\ProfileCover\Command\DeleteCover;
 use Forumaker\ProfileCover\Command\UploadCover;
 
@@ -31,7 +30,7 @@ class UserResourceEndpoints
                 ->route('DELETE', '/{id}/cover')
                 ->action(function (Context $context) {
                     return $this->bus->dispatch(
-                        new DeleteCover(Arr::get($context->request->getQueryParams(), 'id'), $context->getActor())
+                        new DeleteCover($context->modelId, $context->getActor())
                     );
                 }),
         ];

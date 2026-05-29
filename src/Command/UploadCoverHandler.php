@@ -34,7 +34,7 @@ class UploadCoverHandler
         $this->validator->assertValid(['cover' => $command->file]);
 
         $filePath = $command->file->getStream()->getMetadata('uri');
-        $mimeType = $command->file->getClientMediaType();
+        $mimeType = mime_content_type($filePath) ?: $command->file->getClientMediaType();
 
         if ($mimeType === 'image/gif') {
             $this->uploader->uploadGif($user, $filePath);

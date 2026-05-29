@@ -62,31 +62,31 @@ class ThumbnailActionsController implements RequestHandlerInterface
         $count  = 0;
         $errors = 0;
 
-        $users = User::whereNotNull('cover')->where('cover', '!=', '')->get(['cover']);
+        User::whereNotNull('cover')->where('cover', '!=', '')->select(['cover'])->chunk(100, function ($users) use ($width, &$count, &$errors) {
+            foreach ($users as $user) {
+                $coverPath = $user->cover;
 
-        foreach ($users as $user) {
-            $coverPath = $user->cover;
+                if (str_ends_with(strtolower($coverPath), '.gif')) {
+                    continue;
+                }
 
-            if (str_ends_with(strtolower($coverPath), '.gif')) {
-                continue;
+                if (!$this->coversDir->exists($coverPath)) {
+                    continue;
+                }
+
+                try {
+                    $data      = $this->coversDir->get($coverPath);
+                    $image     = $this->imageManager->read($data);
+                    $image->scale($width);
+                    $thumbnail = $image->toJpg();
+
+                    $this->coversDir->put('thumbnails/' . $coverPath, $thumbnail);
+                    $count++;
+                } catch (\Exception $e) {
+                    $errors++;
+                }
             }
-
-            if (!$this->coversDir->exists($coverPath)) {
-                continue;
-            }
-
-            try {
-                $data      = $this->coversDir->get($coverPath);
-                $image     = $this->imageManager->read($data);
-                $image->scale($width);
-                $thumbnail = $image->toJpg();
-
-                $this->coversDir->put('thumbnails/' . $coverPath, $thumbnail);
-                $count++;
-            } catch (\Exception $e) {
-                $errors++;
-            }
-        }
+        });
 
         return new JsonResponse(['recreated' => $count, 'errors' => $errors]);
     }
