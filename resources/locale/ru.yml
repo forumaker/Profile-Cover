@@ -10,7 +10,7 @@ forumaker-profile-cover:
     recreate_thumbnails: Пересоздать миниатюры
     delete_thumbnails: Удалить миниатюры
     recreate_success: Миниатюры пересозданы
-    delete_success: Все миниатюры удалены
+    delete_success: Миниатюры удалены
     recreate_error: Не удалось пересоздать миниатюры
     delete_error: Не удалось удалить миниатюры
     max_size: Максимальный размер обложки (КБ)

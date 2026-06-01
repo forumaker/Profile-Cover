@@ -10,6 +10,7 @@ use Flarum\Foundation\DispatchEventsTrait;
 use Flarum\User\UserRepository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Intervention\Image\ImageManager;
+use Symfony\Component\Mime\MimeTypes;
 
 class UploadCoverHandler
 {
@@ -34,10 +35,10 @@ class UploadCoverHandler
         $this->validator->assertValid(['cover' => $command->file]);
 
         $filePath = $command->file->getStream()->getMetadata('uri');
-        $mimeType = mime_content_type($filePath) ?: $command->file->getClientMediaType();
+        $mimeType = (new MimeTypes())->guessMimeType($filePath);
 
         if ($mimeType === 'image/gif') {
-            $this->uploader->uploadGif($user, $filePath);
+            $this->uploader->uploadGif($user, $command->file);
         } else {
             $image = $this->imageManager->read($filePath);
 
