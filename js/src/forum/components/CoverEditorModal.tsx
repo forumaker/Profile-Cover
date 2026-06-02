@@ -12,6 +12,7 @@ export default class CoverEditorModal extends Modal {
   loading!: boolean;
   cover!: string | null;
   context!: string;
+  fileInputRef: HTMLInputElement | null = null;
 
   oninit(vnode: any) {
     super.oninit(vnode);
@@ -39,6 +40,18 @@ export default class CoverEditorModal extends Modal {
     }
 
     return [
+      <input
+        type="file"
+        accept="image/jpeg,image/png,image/gif,image/bmp,image/webp"
+        style="display:none"
+        oncreate={(vnode: any) => { this.fileInputRef = vnode.dom; }}
+        onchange={(e: Event) => {
+          const files = (e.target as HTMLInputElement).files;
+          if (files?.[0]) this.upload(files[0]);
+          (e.target as HTMLInputElement).value = '';
+        }}
+      />,
+
       <div className={className} {...attrs}>
         {this.loading ? <LoadingIndicator /> : ''}
       </div>,
@@ -84,15 +97,7 @@ export default class CoverEditorModal extends Modal {
   }
 
   openPicker() {
-    const input = $('<input type="file" accept="image/jpeg,image/png,image/gif,image/bmp,image/webp">');
-
-    input
-      .appendTo('body')
-      .hide()
-      .click()
-      .on('change', (e) => {
-        this.upload(($(e.target)[0] as HTMLInputElement).files![0]);
-      });
+    this.fileInputRef?.click();
   }
 
   upload(file: File) {

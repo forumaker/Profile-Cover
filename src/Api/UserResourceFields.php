@@ -4,7 +4,7 @@ namespace Forumaker\ProfileCover\Api;
 
 use Flarum\Api\Context;
 use Flarum\Api\Schema;
-use Flarum\Foundation\Paths;
+use Flarum\Settings\SettingsRepositoryInterface;
 use Flarum\User\User;
 use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Contracts\Filesystem\Filesystem;
@@ -13,8 +13,10 @@ class UserResourceFields
 {
     protected Filesystem $coversDir;
 
-    public function __construct(protected Paths $paths, Factory $filesystem)
-    {
+    public function __construct(
+        private SettingsRepositoryInterface $settings,
+        Factory $filesystem
+    ) {
         $this->coversDir = $filesystem->disk('forumaker-profile-cover');
     }
 
@@ -30,7 +32,7 @@ class UserResourceFields
         ];
     }
 
-    public function thumbnailUrl(?string $imageName): ?string
+    private function thumbnailUrl(?string $imageName): ?string
     {
         if (empty($imageName)) {
             return null;
@@ -40,10 +42,8 @@ class UserResourceFields
             return $this->coversDir->url($imageName);
         }
 
-        $thumbnailName = 'thumbnails/' . $imageName;
-
-        if ($this->coversDir->exists($thumbnailName)) {
-            return $this->coversDir->url($thumbnailName);
+        if ($this->settings->get('forumaker-profile-cover.thumbnails', 0) == 1) {
+            return $this->coversDir->url('thumbnails/' . $imageName);
         }
 
         return $this->coversDir->url($imageName);

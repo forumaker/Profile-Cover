@@ -3,15 +3,15 @@
 namespace Forumaker\ProfileCover\Api;
 
 use Flarum\Http\RequestUtil;
-use Flarum\Settings\SettingsRepositoryInterface;
-use Flarum\User\User;
+use Forumaker\ProfileCover\Job\RecreateProfileCoverThumbnailsJob;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Contracts\Filesystem\Filesystem;
-use Intervention\Image\ImageManager;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Log\LoggerInterface;
 
 class ThumbnailActionsController implements RequestHandlerInterface
 {
@@ -19,8 +19,8 @@ class ThumbnailActionsController implements RequestHandlerInterface
 
     public function __construct(
         Factory $filesystem,
-        protected ImageManager $imageManager,
-        protected SettingsRepositoryInterface $settings
+        protected Dispatcher $bus,
+        protected LoggerInterface $logger
     ) {
         $this->coversDir = $filesystem->disk('forumaker-profile-cover');
     }
@@ -30,7 +30,7 @@ class ThumbnailActionsController implements RequestHandlerInterface
         $actor = RequestUtil::getActor($request);
         $actor->assertAdmin();
 
-        $action = basename($request->getUri()->getPath());
+        $action = $request->getAttribute('routeParameters')['action'] ?? '';
 
         return match ($action) {
             'delete'   => $this->deleteThumbnails(),
@@ -44,6 +44,9 @@ class ThumbnailActionsController implements RequestHandlerInterface
         try {
             $files = $this->coversDir->files('thumbnails');
         } catch (\Exception $e) {
+            $this->logger->warning('forumaker-profile-cover: failed to list thumbnail files', [
+                'exception' => $e,
+            ]);
             $files = [];
         }
 
@@ -58,36 +61,8 @@ class ThumbnailActionsController implements RequestHandlerInterface
 
     private function recreateThumbnails(): ResponseInterface
     {
-        $width  = (int) $this->settings->get('forumaker-profile-cover.thumbnail_width', 500);
-        $count  = 0;
-        $errors = 0;
+        $this->bus->dispatch(new RecreateProfileCoverThumbnailsJob());
 
-        User::whereNotNull('cover')->where('cover', '!=', '')->select(['cover'])->chunk(100, function ($users) use ($width, &$count, &$errors) {
-            foreach ($users as $user) {
-                $coverPath = $user->cover;
-
-                if (str_ends_with(strtolower($coverPath), '.gif')) {
-                    continue;
-                }
-
-                if (!$this->coversDir->exists($coverPath)) {
-                    continue;
-                }
-
-                try {
-                    $data      = $this->coversDir->get($coverPath);
-                    $image     = $this->imageManager->read($data);
-                    $image->scale($width);
-                    $thumbnail = $image->toJpg();
-
-                    $this->coversDir->put('thumbnails/' . $coverPath, $thumbnail);
-                    $count++;
-                } catch (\Exception $e) {
-                    $errors++;
-                }
-            }
-        });
-
-        return new JsonResponse(['recreated' => $count, 'errors' => $errors]);
+        return new JsonResponse(['queued' => true], 202);
     }
 }

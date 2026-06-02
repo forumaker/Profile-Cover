@@ -8,6 +8,7 @@ use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Flarum\User\User;
 use Flarum\Settings\SettingsRepositoryInterface;
+use Psr\Http\Message\UploadedFileInterface;
 
 class CoverUploader
 {
@@ -46,14 +47,14 @@ class CoverUploader
         $this->coversDir->put($coverPath, $encodedImage);
     }
 
-    public function uploadGif(User $user, string $filePath): void
+    public function uploadGif(User $user, UploadedFileInterface $file): void
     {
         $coverPath = Str::random() . '.gif';
 
         $this->remove($user);
         $user->cover = $coverPath;
 
-        $this->coversDir->put($coverPath, file_get_contents($filePath));
+        $this->coversDir->put($coverPath, $file->getStream());
     }
 
     public function remove(User $user): void

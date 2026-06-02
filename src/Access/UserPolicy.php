@@ -10,7 +10,7 @@ class UserPolicy extends AbstractPolicy
     public function setProfileCover(User $actor, User $user)
     {
         if ($actor->hasPermission('setProfileCover')
-            && ($actor->id === $user->id || ($actor->id !== $user->id && $actor->can('edit', $user)))
+            && ($actor->id === $user->id || $actor->can('edit', $user))
         ) {
             return $this->allow();
         }
