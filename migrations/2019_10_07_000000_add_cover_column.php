@@ -1,7 +1,21 @@
 <?php
 
-use Flarum\Database\Migration;
+use Illuminate\Database\Schema\Builder;
 
-return Migration::addColumns('users', [
-    'cover' => ['string', 'nullable' => true, 'length' => 150],
-]);
+return [
+    'up' => function (Builder $schema) {
+        if (! $schema->hasColumn('users', 'cover')) {
+            $schema->table('users', function ($table) {
+                $table->string('cover', 150)->nullable();
+            });
+        }
+    },
+
+    'down' => function (Builder $schema) {
+        if ($schema->hasColumn('users', 'cover')) {
+            $schema->table('users', function ($table) {
+                $table->dropColumn('cover');
+            });
+        }
+    },
+];
