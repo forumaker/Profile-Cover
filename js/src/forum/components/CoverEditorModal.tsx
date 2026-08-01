@@ -5,6 +5,12 @@ import Button from 'flarum/common/components/Button';
 import ItemList from 'flarum/common/utils/ItemList';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
 import formatBytes from '../../common/formatBytes';
+import type Mithril from 'mithril';
+
+interface ApiPayload {
+  data: object;
+  included?: object[];
+}
 
 export default class CoverEditorModal extends Modal {
   maxSize!: number;
@@ -14,7 +20,7 @@ export default class CoverEditorModal extends Modal {
   context!: string;
   fileInputRef: HTMLInputElement | null = null;
 
-  oninit(vnode: any) {
+  oninit(vnode: Mithril.Vnode<this>) {
     super.oninit(vnode);
 
     this.maxSize = parseFloat(app.forum.attribute('forumaker-profile-cover.max_size') || 2048);
@@ -44,7 +50,7 @@ export default class CoverEditorModal extends Modal {
         type="file"
         accept="image/jpeg,image/png,image/gif,image/bmp,image/webp"
         style="display:none"
-        oncreate={(vnode: any) => { this.fileInputRef = vnode.dom; }}
+        oncreate={(vnode: Mithril.Vnode<this>) => { this.fileInputRef = vnode.dom as HTMLInputElement; }}
         onchange={(e: Event) => {
           const files = (e.target as HTMLInputElement).files;
           if (files?.[0]) this.upload(files[0]);
@@ -133,7 +139,7 @@ export default class CoverEditorModal extends Modal {
       .then(this.success.bind(this), this.failure.bind(this));
   }
 
-  success(response: any) {
+  success(response: ApiPayload) {
     app.store.pushPayload(response);
     this.showAlert('success');
     this.loading = false;

@@ -50,13 +50,23 @@ class ThumbnailActionsController implements RequestHandlerInterface
             $files = [];
         }
 
-        $count = 0;
+        $deleted = 0;
+        $failed  = 0;
+
         foreach ($files as $file) {
-            $this->coversDir->delete($file);
-            $count++;
+            try {
+                $this->coversDir->delete($file);
+                $deleted++;
+            } catch (\Exception $e) {
+                $failed++;
+                $this->logger->warning('forumaker-profile-cover: failed to delete thumbnail file', [
+                    'file'      => $file,
+                    'exception' => $e,
+                ]);
+            }
         }
 
-        return new JsonResponse(['deleted' => $count]);
+        return new JsonResponse(['deleted' => $deleted, 'failed' => $failed]);
     }
 
     private function recreateThumbnails(): ResponseInterface

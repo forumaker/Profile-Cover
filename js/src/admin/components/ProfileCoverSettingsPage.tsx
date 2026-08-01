@@ -114,6 +114,14 @@ export default class ProfileCoverSettingsPage extends ExtensionPage {
   }
 
   async doAction(action: 'recreate' | 'delete') {
+    const confirmed = confirm(
+      app.translator.trans(`forumaker-profile-cover.admin.${action}_thumbnails_confirm`) as string
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
     if (action === 'recreate') {
       this.loadingRecreate = true;
     } else {
