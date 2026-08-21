@@ -11,7 +11,7 @@ export { default as extend } from './extend';
 
 app.initializers.add('forumaker-profile-cover', () => {
   extend(UserCard.prototype, 'view', function (view: Mithril.Vnode) {
-    if (!view.attrs.style || !this.attrs.user.cover()) return;
+    if (!this.attrs.user.cover()) return;
 
     const coverUrl     = this.attrs.user.cover();
     const thumbnailUrl = this.attrs.user.cover_thumbnail();
@@ -20,9 +20,11 @@ app.initializers.add('forumaker-profile-cover', () => {
 
     const isProfilePage = app.current.matches(UserPage);
     const imageUrl      = (!isProfilePage && thumbnailUrl) ? thumbnailUrl : coverUrl;
+    const position      = this.attrs.user.cover_position() ?? 50;
 
-    view.attrs.style = Object.assign(view.attrs.style, {
+    view.attrs.style = Object.assign(view.attrs.style || {}, {
       '--background-image': `url(${imageUrl})`,
+      '--background-position': `center ${position}%`,
     });
   });
 

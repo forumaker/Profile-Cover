@@ -5,5 +5,6 @@ export default [
   new Extend.Model(User)
     .attribute<string | null>('cover')
     .attribute<string | null>('cover_thumbnail')
-    .attribute<boolean>('canSetProfileCover'),
+    .attribute<boolean>('canSetProfileCover')
+    .attribute<number>('cover_position'),
 ];
