@@ -28,6 +28,8 @@ export default class CoverEditorModal extends Modal {
     this.alertAttrs = {
       content: app.translator.trans('forumaker-profile-cover.forum.notice', {
         size: formatBytes(this.maxSize * Math.pow(2, 10)),
+        width: 1600,
+        height: 400,
       }) as string,
     };
 
