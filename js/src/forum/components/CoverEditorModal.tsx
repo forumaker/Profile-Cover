@@ -19,6 +19,8 @@ export default class CoverEditorModal extends Modal {
   cover!: string | null;
   context!: string;
   position!: number;
+  initialPosition!: number;
+  savingPosition!: boolean;
   fileInputRef: HTMLInputElement | null = null;
 
   oninit(vnode: Mithril.Vnode<this>) {
@@ -35,6 +37,8 @@ export default class CoverEditorModal extends Modal {
     this.loading = false;
     this.cover = this.attrs.user.cover_thumbnail() || this.attrs.user.cover();
     this.position = this.attrs.user.cover_position() ?? 50;
+    this.initialPosition = this.position;
+    this.savingPosition = false;
     this.context = '';
   }
 
@@ -91,6 +95,8 @@ export default class CoverEditorModal extends Modal {
   }
 
   positionSlider() {
+    const changed = this.position !== this.initialPosition;
+
     return (
       <div className="Form-group">
         <label>{app.translator.trans('forumaker-profile-cover.forum.position_label')}</label>
@@ -103,8 +109,17 @@ export default class CoverEditorModal extends Modal {
           oninput={(e: InputEvent) => {
             this.position = parseInt((e.target as HTMLInputElement).value, 10);
           }}
-          onchange={this.savePosition.bind(this)}
         />
+        {changed && (
+          <Button
+            icon="fas fa-check"
+            className="Button Button--block CoverEditor-savePosition"
+            loading={this.savingPosition}
+            onclick={this.savePosition.bind(this)}
+          >
+            {app.translator.trans('forumaker-profile-cover.forum.save_position_button')}
+          </Button>
+        )}
       </div>
     );
   }
@@ -153,12 +168,28 @@ export default class CoverEditorModal extends Modal {
       })
       .then((response: ApiPayload) => {
         this.success(response);
+        this.initialPosition = 50;
         this.attrs.user.save({ cover_position: 50 });
       }, this.failure.bind(this));
   }
 
   savePosition() {
-    this.attrs.user.save({ cover_position: this.position }).then(() => m.redraw());
+    if (this.savingPosition) return;
+
+    this.savingPosition = true;
+    m.redraw();
+
+    this.attrs.user.save({ cover_position: this.position }).then(
+      () => {
+        this.initialPosition = this.position;
+        this.savingPosition = false;
+        m.redraw();
+      },
+      () => {
+        this.savingPosition = false;
+        m.redraw();
+      }
+    );
   }
 
   remove() {
