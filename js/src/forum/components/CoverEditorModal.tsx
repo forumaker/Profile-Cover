@@ -18,6 +18,7 @@ export default class CoverEditorModal extends Modal {
   loading!: boolean;
   cover!: string | null;
   context!: string;
+  position!: number;
   fileInputRef: HTMLInputElement | null = null;
 
   oninit(vnode: Mithril.Vnode<this>) {
@@ -28,13 +29,12 @@ export default class CoverEditorModal extends Modal {
     this.alertAttrs = {
       content: app.translator.trans('forumaker-profile-cover.forum.notice', {
         size: formatBytes(this.maxSize * Math.pow(2, 10)),
-        width: 1600,
-        height: 400,
       }) as string,
     };
 
     this.loading = false;
     this.cover = this.attrs.user.cover_thumbnail() || this.attrs.user.cover();
+    this.position = this.attrs.user.cover_position() ?? 50;
     this.context = '';
   }
 
@@ -43,7 +43,7 @@ export default class CoverEditorModal extends Modal {
     let className = 'Modal-image CoverEditor-cover';
 
     if (this.cover) {
-      attrs.style = { backgroundImage: `url(${this.cover})` };
+      attrs.style = { backgroundImage: `url(${this.cover})`, backgroundPosition: `center ${this.position}%` };
       className += ' CoverEditor-active';
     }
 
@@ -80,8 +80,33 @@ export default class CoverEditorModal extends Modal {
 
   fieldsItems() {
     const items = new ItemList();
+
+    if (this.cover) {
+      items.add('position', this.positionSlider(), 10);
+    }
+
     items.add('actions', this.controlItems().toArray());
+
     return items;
+  }
+
+  positionSlider() {
+    return (
+      <div className="Form-group">
+        <label>{app.translator.trans('forumaker-profile-cover.forum.position_label')}</label>
+        <input
+          type="range"
+          className="CoverEditor-positionSlider"
+          min="0"
+          max="100"
+          value={this.position}
+          oninput={(e: InputEvent) => {
+            this.position = parseInt((e.target as HTMLInputElement).value, 10);
+          }}
+          onchange={this.savePosition.bind(this)}
+        />
+      </div>
+    );
   }
 
   controlItems() {
@@ -116,6 +141,7 @@ export default class CoverEditorModal extends Modal {
 
     this.loading = true;
     this.context = 'added';
+    this.position = 50;
     m.redraw();
 
     app
@@ -125,7 +151,14 @@ export default class CoverEditorModal extends Modal {
         serialize: (raw: any) => raw,
         body: data,
       })
-      .then(this.success.bind(this), this.failure.bind(this));
+      .then((response: ApiPayload) => {
+        this.success(response);
+        this.attrs.user.save({ cover_position: 50 });
+      }, this.failure.bind(this));
+  }
+
+  savePosition() {
+    this.attrs.user.save({ cover_position: this.position }).then(() => m.redraw());
   }
 
   remove() {
