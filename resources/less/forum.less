@@ -1,8 +1,13 @@
 .UserHero, .CoverEditor-cover, body.dark .UserPage .Hero, .UserCard {
   background-image: var(--background-image);
-  background-position: center;
+  background-position: var(--background-position, center);
   background-size: cover;
   background-repeat: no-repeat;
+}
+
+.CoverEditor-positionSlider {
+  width: 100%;
+  margin: 10px 0;
 }
 
 .CoverEditor-active {
