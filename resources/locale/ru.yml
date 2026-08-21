@@ -21,7 +21,7 @@ forumaker-profile-cover:
   forum:
     cover: Обложка
     edit_cover: Изменение обложки
-    notice: "Максимальный размер: {size}"
+    notice: "Максимальный размер: {size}. Рекомендуется {width}x{height}"
     added:
       success: Обложка профиля обновлена
       error: Не удалось загрузить изображение
