@@ -21,7 +21,8 @@ return [
     new Extend\Locales(__DIR__.'/resources/locale'),
 
     (new Extend\Model(User::class))
-        ->cast('cover', 'string'),
+        ->cast('cover', 'string')
+        ->cast('cover_position', 'integer'),
 
     (new Extend\Settings())
         ->serializeToForum('forumaker-profile-cover.max_size', 'forumaker-profile-cover.max_size'),

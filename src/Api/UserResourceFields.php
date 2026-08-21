@@ -29,6 +29,10 @@ class UserResourceFields
                 ->get(fn (User $user) => $this->thumbnailUrl($user->cover)),
             Schema\Boolean::make('canSetProfileCover')
                 ->get(fn (User $user, Context $context) => $context->getActor()->can('setProfileCover', $user)),
+            Schema\Integer::make('cover_position')
+                ->get(fn (User $user) => $user->cover_position ?? 50)
+                ->writable(fn (User $user, Context $context) => $context->getActor()->can('setProfileCover', $user))
+                ->set(fn (User $user, $value) => $user->cover_position = max(0, min(100, (int) $value))),
         ];
     }
 
