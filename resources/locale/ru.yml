@@ -21,7 +21,8 @@ forumaker-profile-cover:
   forum:
     cover: Обложка
     edit_cover: Изменение обложки
-    notice: "Максимальный размер: {size}. Рекомендуется {width}x{height}"
+    notice: "Максимальный размер: {size}. Рекомендуемый формат — 21:9 и не менее 1600x400 пикселей"
+    position_label: Положение обложки
     added:
       success: Обложка профиля обновлена
       error: Не удалось загрузить изображение

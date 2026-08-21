@@ -21,7 +21,8 @@ forumaker-profile-cover:
   forum:
     cover: Cover
     edit_cover: Edit Cover
-    notice: "Maximum size: {size}. Recommended {width}x{height}"
+    notice: "Maximum size: {size}. Recommended format — 21:9 and at least 1600x400 pixels"
+    position_label: Cover position
     added:
       success: Profile cover updated
       error: Image could not be uploaded
