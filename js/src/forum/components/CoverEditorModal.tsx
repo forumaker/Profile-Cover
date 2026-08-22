@@ -113,7 +113,7 @@ export default class CoverEditorModal extends Modal {
         {changed && (
           <Button
             icon="fas fa-check"
-            className="Button Button--block CoverEditor-savePosition"
+            className="Button Button--block Button--primary CoverEditor-savePosition"
             loading={this.savingPosition}
             onclick={this.savePosition.bind(this)}
           >
@@ -184,6 +184,7 @@ export default class CoverEditorModal extends Modal {
         this.initialPosition = this.position;
         this.savingPosition = false;
         m.redraw();
+        this.hide();
       },
       () => {
         this.savingPosition = false;
