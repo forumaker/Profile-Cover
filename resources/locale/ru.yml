@@ -22,7 +22,7 @@ forumaker-profile-cover:
     cover: Обложка
     edit_cover: Изменение обложки
     notice: "Максимальный размер: {size}. Рекомендуемый формат — 21:9 и не менее 1600x400 пикселей"
-    position_label: Положение обложки на десктопе
+    position_label: Положение обложки на компьютере
     save_position_button: Сохранить положение
     added:
       success: Обложка профиля обновлена
