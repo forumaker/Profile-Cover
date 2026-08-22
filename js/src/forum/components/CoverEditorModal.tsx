@@ -108,6 +108,7 @@ export default class CoverEditorModal extends Modal {
           min="0"
           max="100"
           value={this.position}
+          ontouchmove={(e: TouchEvent) => e.stopPropagation()}
           oninput={(e: InputEvent) => {
             this.position = parseInt((e.target as HTMLInputElement).value, 10);
           }}
