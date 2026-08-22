@@ -101,7 +101,7 @@ export default class CoverEditorModal extends Modal {
   positionSlider() {
     return (
       <div className="Form-group">
-        <label>{app.translator.trans('forumaker-profile-cover.forum.position_label')}</label>
+        <label className="CoverEditor-positionLabel">{app.translator.trans('forumaker-profile-cover.forum.position_label')}</label>
         <input
           type="range"
           className="CoverEditor-positionSlider"
