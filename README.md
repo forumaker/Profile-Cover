@@ -16,6 +16,10 @@ ___
 
 <img width="1300" height="170" alt="image" src="https://github.com/user-attachments/assets/c6a07c0f-f4aa-4acc-9f6a-1ded845a0409" />
 
+___
+
+<img width="1585" height="700" alt="image" src="https://github.com/user-attachments/assets/f4c3611c-c306-47c5-9ff6-3ca00fadc53e" />
+
 
 
 ## 📦 Installation
@@ -38,4 +42,4 @@ composer require forumaker/profile-cover:"*"
 - [Discuss](https://discuss.flarum.org/d/39144-profile-cover-thumbnails-and-gif-support)
 
 
-Fork of [sycho/flarum-profile-cover](https://github.com/SychO9/flarum-profile-cover) with GIF and WebP support and improved thumbnails
+Fork of [sycho/flarum-profile-cover](https://github.com/SychO9/flarum-profile-cover) with GIF and WebP support, improved thumbnails and adjustable cover size
