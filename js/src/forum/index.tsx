@@ -29,7 +29,7 @@ app.initializers.add('forumaker-profile-cover', () => {
   });
 
   if ('fof-blog' in flarum.extensions) {
-    extend('fof-blog/forum/components/BlogItemSidebar/BlogAuthor', 'view', function (view: Mithril.Vnode) {
+    extend('ext:fof/blog/forum/components/BlogItemSidebar/BlogAuthor', 'view', function (view: Mithril.Vnode) {
       const author = this.attrs.loading ? null : this.attrs.article ? this.attrs.article.user() : this.attrs.user;
 
       if (!author || !author.cover()) return;
