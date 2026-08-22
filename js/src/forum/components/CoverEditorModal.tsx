@@ -87,6 +87,10 @@ export default class CoverEditorModal extends Modal {
 
     if (this.cover) {
       items.add('position', this.positionSlider(), 10);
+
+      if (this.position !== this.initialPosition) {
+        items.add('savePosition', this.savePositionButton(), 9);
+      }
     }
 
     items.add('actions', this.controlItems().toArray());
@@ -95,8 +99,6 @@ export default class CoverEditorModal extends Modal {
   }
 
   positionSlider() {
-    const changed = this.position !== this.initialPosition;
-
     return (
       <div className="Form-group">
         <label>{app.translator.trans('forumaker-profile-cover.forum.position_label')}</label>
@@ -110,17 +112,20 @@ export default class CoverEditorModal extends Modal {
             this.position = parseInt((e.target as HTMLInputElement).value, 10);
           }}
         />
-        {changed && (
-          <Button
-            icon="fas fa-check"
-            className="Button Button--block Button--primary CoverEditor-savePosition"
-            loading={this.savingPosition}
-            onclick={this.savePosition.bind(this)}
-          >
-            {app.translator.trans('forumaker-profile-cover.forum.save_position_button')}
-          </Button>
-        )}
       </div>
+    );
+  }
+
+  savePositionButton() {
+    return (
+      <Button
+        icon="fas fa-check"
+        className="Button Button--block CoverEditor-savePosition"
+        loading={this.savingPosition}
+        onclick={this.savePosition.bind(this)}
+      >
+        {app.translator.trans('forumaker-profile-cover.forum.save_position_button')}
+      </Button>
     );
   }
 
