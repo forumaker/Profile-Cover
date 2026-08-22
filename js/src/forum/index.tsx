@@ -28,6 +28,28 @@ app.initializers.add('forumaker-profile-cover', () => {
     });
   });
 
+  if ('fof-blog' in flarum.extensions) {
+    extend('fof-blog/forum/components/BlogItemSidebar/BlogAuthor', 'view', function (view: Mithril.Vnode) {
+      const author = this.attrs.loading ? null : this.attrs.article ? this.attrs.article.user() : this.attrs.user;
+
+      if (!author || !author.cover()) return;
+
+      const background = (view.children as Mithril.Vnode[])?.find(
+        (child) => typeof child?.attrs?.className === 'string' && child.attrs.className.includes('FoFBlog-Article-Author-background')
+      );
+
+      if (!background) return;
+
+      const position = author.cover_position() ?? 50;
+
+      background.attrs.style = Object.assign(background.attrs.style || {}, {
+        backgroundImage: `url(${author.cover()})`,
+        backgroundPosition: `center ${position}%`,
+        backgroundSize: 'cover',
+      });
+    });
+  }
+
   extend(UserControls, 'moderationControls', function (items, user) {
     if (!user.canSetProfileCover()) return;
 
