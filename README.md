@@ -7,6 +7,7 @@ Adds the ability to upload a cover image to a profile. **Supports Flarum 2.x onl
 - 🎞️ GIF support — animated covers
 - 📐 Proportional thumbnails — no cropping
 - ⚙️ Configurable max file size in admin panel
+- 📝 Compatible with FoF Blog — cover shows behind the author card on blog posts
 
 
 ## 📸 Screenshots
