@@ -21,6 +21,7 @@ class CoverValidator extends AbstractImageValidator
 
     public function assertValid(array $attributes): void
     {
+        $this->filename = 'cover';
         $this->laravelValidator = $this->makeValidator($attributes);
 
         $this->assertFileRequired($attributes['cover']);
