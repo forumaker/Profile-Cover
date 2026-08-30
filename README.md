@@ -41,6 +41,3 @@ composer require forumaker/profile-cover:"*"
 - [GitHub Repository](https://github.com/forumaker/profile-cover)
 - [Packagist](https://packagist.org/packages/forumaker/profile-cover)
 - [Discuss](https://discuss.flarum.org/d/39144-profile-cover-thumbnails-and-gif-support)
-
-
-Fork of [sycho/flarum-profile-cover](https://github.com/SychO9/flarum-profile-cover) with GIF and WebP support, improved thumbnails and adjustable cover size
