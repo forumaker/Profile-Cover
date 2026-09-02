@@ -4,6 +4,10 @@ use Illuminate\Database\Schema\Builder;
 
 return [
     'up' => function (Builder $schema) {
+        // Raw `settings` table access instead of SettingsRepositoryInterface:
+        // migrations run before the container is fully booted, so the
+        // repository isn't reliably available here — direct DB access is
+        // the pragmatic (if table-name-coupled) option in this context.
         $db = $schema->getConnection();
 
         $keys = ['max_size', 'thumbnails'];

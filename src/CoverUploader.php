@@ -34,7 +34,11 @@ class CoverUploader
         $user->cover = $coverPath;
 
         if ($makeThumb) {
-            $thumbWidth    = (int) $this->config->get('forumaker-profile-cover.thumbnail_width', 500);
+            // 1px floor: Image::scale(0) throws, and an admin clearing or
+            // zeroing the setting would otherwise turn every upload into a
+            // failed one (see the matching floor in
+            // RecreateProfileCoverThumbnailsJob::handle()).
+            $thumbWidth    = max(1, (int) $this->config->get('forumaker-profile-cover.thumbnail_width', 500));
             $thumbnail     = clone $image;
             $thumbnailPath = 'thumbnails/' . $coverPath;
 

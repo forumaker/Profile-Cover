@@ -21,12 +21,15 @@ class CoverValidator extends AbstractImageValidator
 
     public function assertValid(array $attributes): void
     {
+        // Deliberately just sets $this->filename and defers to the parent
+        // implementation, rather than re-listing the assert* calls here:
+        // AbstractImageValidator::assertValid() checks file size *before*
+        // mimes (which decodes the image) specifically so an oversized
+        // upload is rejected before ever being read into memory — a local
+        // reimplementation had this order backwards.
         $this->filename = 'cover';
-        $this->laravelValidator = $this->makeValidator($attributes);
 
-        $this->assertFileRequired($attributes['cover']);
-        $this->assertFileMimes($attributes['cover']);
-        $this->assertFileSize($attributes['cover']);
+        parent::assertValid($attributes);
     }
 
     public function getMaxSize(): int

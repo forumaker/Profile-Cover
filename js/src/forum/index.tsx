@@ -38,7 +38,17 @@ app.initializers.add('forumaker-profile-cover', () => {
         (child) => typeof child?.attrs?.className === 'string' && child.attrs.className.includes('FoFBlog-Article-Author-background')
       );
 
-      if (!background) return;
+      if (!background) {
+        // This scans fof/blog's own render tree for a class name it doesn't
+        // expose as a stable hook — a fof/blog markup refactor can silently
+        // break this integration with no other symptom than a missing
+        // background image. Surface it in debug mode instead of failing quiet.
+        if (app.forum.attribute('debug')) {
+          console.warn('[forumaker-profile-cover] Could not find FoFBlog-Article-Author-background — fof/blog markup may have changed.');
+        }
+
+        return;
+      }
 
       const position = author.cover_position() ?? 50;
 

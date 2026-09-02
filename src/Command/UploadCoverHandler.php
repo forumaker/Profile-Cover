@@ -4,6 +4,7 @@ namespace Forumaker\ProfileCover\Command;
 
 use Flarum\Foundation\ValidationException;
 use Flarum\User\User;
+use Forumaker\ProfileCover\CoverImageLimits;
 use Forumaker\ProfileCover\CoverUploader;
 use Forumaker\ProfileCover\CoverValidator;
 use Forumaker\ProfileCover\Event\CoverSaving;
@@ -17,13 +18,6 @@ use Symfony\Component\Mime\MimeTypes;
 class UploadCoverHandler
 {
     use DispatchEventsTrait;
-
-    /**
-     * Maximum allowed width/height (in pixels) for an uploaded cover image.
-     * Guards against decoding pathologically large images into memory
-     * (a maximally-compressed image can have a huge pixel buffer despite a small file size).
-     */
-    protected const MAX_IMAGE_DIMENSION = 10000;
 
     public function __construct(
         protected Dispatcher $events,
@@ -81,20 +75,27 @@ class UploadCoverHandler
     /**
      * Reads only the image header (not the full pixel buffer) to reject
      * oversized images before Intervention Image decodes them into memory.
+     *
+     * A file getimagesize() can't read the dimensions of is rejected rather
+     * than let through: every non-GIF type this handler still allows past
+     * CoverValidator (jpeg/png/bmp/webp) is one getimagesize() reliably
+     * parses, so a `false` here means either a corrupt file or one crafted
+     * to confuse the header parser — either way, not something we want
+     * handed to Intervention Image's decoder unchecked.
      */
     private function assertDimensionsWithinLimit(string $filePath): void
     {
         $dimensions = @getimagesize($filePath);
 
         if ($dimensions === false) {
-            return;
+            throw new ValidationException(['cover' => ['The uploaded image file is corrupted or unreadable.']]);
         }
 
         [$width, $height] = $dimensions;
 
-        if ($width > self::MAX_IMAGE_DIMENSION || $height > self::MAX_IMAGE_DIMENSION) {
+        if ($width > CoverImageLimits::MAX_IMAGE_DIMENSION || $height > CoverImageLimits::MAX_IMAGE_DIMENSION) {
             throw new ValidationException([
-                'cover' => ['The uploaded image dimensions are too large (maximum ' . self::MAX_IMAGE_DIMENSION . 'px per side).'],
+                'cover' => ['The uploaded image dimensions are too large (maximum ' . CoverImageLimits::MAX_IMAGE_DIMENSION . 'px per side).'],
             ]);
         }
     }
