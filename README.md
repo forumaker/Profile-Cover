@@ -41,3 +41,6 @@ composer require forumaker/profile-cover:"*"
 - [GitHub Repository](https://github.com/forumaker/profile-cover)
 - [Packagist](https://packagist.org/packages/forumaker/profile-cover)
 - [Discuss](https://discuss.flarum.org/d/39144-profile-cover-thumbnails-and-gif-support)
+
+
+Based on the simple yet wonderful [Profile Cover](https://discuss.flarum.org/d/23437-profile-cover) extension
