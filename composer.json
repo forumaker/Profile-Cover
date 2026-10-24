@@ -18,11 +18,11 @@
     }
   ],
   "require": {
-    "php": ">=8.3",
-    "flarum/core": "^2.0"
+    "php": "^8.3",
+    "flarum/core": "^2.0.0"
   },
   "require-dev": {
-    "flarum/testing": "^2.0"
+    "flarum/testing": "^2.0.0"
   },
   "autoload": {
     "psr-4": {
@@ -59,7 +59,5 @@
   },
   "config": {
     "sort-packages": true
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true
+  }
 }
