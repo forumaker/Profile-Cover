@@ -4,9 +4,9 @@ import Switch from 'flarum/common/components/Switch';
 import Button from 'flarum/common/components/Button';
 import withAttr from 'flarum/common/utils/withAttr';
 import formatBytes from '../../common/formatBytes';
-import type m from 'mithril';
+import type Mithril from 'mithril';
 
-function Section(iconClass: string, title: string, ...children: m.Children[]) {
+function Section(iconClass: string, title: string, ...children: Mithril.Children[]) {
   return (
     <section className="ProfileCover-Section">
       <h3>
@@ -23,13 +23,12 @@ export default class ProfileCoverSettingsPage extends ExtensionPage {
   loadingDelete = false;
 
   content() {
-    const maxSize    = this.setting('forumaker-profile-cover.max_size', '2048');
+    const maxSize = this.setting('forumaker-profile-cover.max_size', '2048');
     const thumbWidth = this.setting('forumaker-profile-cover.thumbnail_width', '500');
 
     return (
       <div className="ProfileCoverPage">
         <div className="ProfileCoverPage-content">
-
           {Section(
             'fas fa-images',
             app.translator.trans('forumaker-profile-cover.admin.sections.thumbnails') as string,
@@ -38,29 +37,17 @@ export default class ProfileCoverSettingsPage extends ExtensionPage {
               {Switch.component(
                 {
                   state: this.setting('forumaker-profile-cover.thumbnails', '0')() === '1',
-                  onchange: (val: boolean) =>
-                    this.setting('forumaker-profile-cover.thumbnails')(val ? '1' : '0'),
+                  onchange: (val: boolean) => this.setting('forumaker-profile-cover.thumbnails')(val ? '1' : '0'),
                 },
                 app.translator.trans('forumaker-profile-cover.admin.thumbnails')
               )}
-              <p className="helpText">
-                {app.translator.trans('forumaker-profile-cover.admin.thumbnails_help')}
-              </p>
+              <p className="helpText">{app.translator.trans('forumaker-profile-cover.admin.thumbnails_help')}</p>
             </div>,
 
             <div className="Form-group">
               <label>{app.translator.trans('forumaker-profile-cover.admin.thumbnail_width')}</label>
-              <input
-                type="number"
-                className="FormControl"
-                value={thumbWidth()}
-                oninput={withAttr('value', thumbWidth)}
-                min="100"
-                max="2000"
-              />
-              <p className="helpText">
-                {app.translator.trans('forumaker-profile-cover.admin.thumbnail_width_help')}
-              </p>
+              <input type="number" className="FormControl" value={thumbWidth()} oninput={withAttr('value', thumbWidth)} min="100" max="2000" />
+              <p className="helpText">{app.translator.trans('forumaker-profile-cover.admin.thumbnail_width_help')}</p>
             </div>,
 
             <div className="Form-group ProfileCover-actions">
@@ -92,17 +79,8 @@ export default class ProfileCoverSettingsPage extends ExtensionPage {
             <div className="Form-group">
               <label>{app.translator.trans('forumaker-profile-cover.admin.max_size')}</label>
               <div className="ProfileCover-size-input">
-                <input
-                  type="number"
-                  className="FormControl"
-                  value={maxSize()}
-                  oninput={withAttr('value', maxSize)}
-                />
-                <input
-                  className="FormControl"
-                  value={formatBytes(Number(maxSize()) * Math.pow(2, 10))}
-                  disabled
-                />
+                <input type="number" className="FormControl" value={maxSize()} oninput={withAttr('value', maxSize)} />
+                <input className="FormControl" value={formatBytes(Number(maxSize()) * Math.pow(2, 10))} disabled />
               </div>
             </div>
           )}
@@ -114,9 +92,7 @@ export default class ProfileCoverSettingsPage extends ExtensionPage {
   }
 
   async doAction(action: 'recreate' | 'delete') {
-    const confirmed = confirm(
-      app.translator.trans(`forumaker-profile-cover.admin.${action}_thumbnails_confirm`) as string
-    );
+    const confirmed = confirm(app.translator.trans(`forumaker-profile-cover.admin.${action}_thumbnails_confirm`) as string);
 
     if (!confirmed) {
       return;
@@ -135,15 +111,9 @@ export default class ProfileCoverSettingsPage extends ExtensionPage {
         url: `${app.forum.attribute('apiUrl')}/forumaker-profile-cover/thumbnails/${action}`,
       });
 
-      app.alerts.show(
-        { type: 'success' },
-        app.translator.trans(`forumaker-profile-cover.admin.${action}_success`)
-      );
+      app.alerts.show({ type: 'success' }, app.translator.trans(`forumaker-profile-cover.admin.${action}_success`));
     } catch {
-      app.alerts.show(
-        { type: 'error' },
-        app.translator.trans(`forumaker-profile-cover.admin.${action}_error`)
-      );
+      app.alerts.show({ type: 'error' }, app.translator.trans(`forumaker-profile-cover.admin.${action}_error`));
     } finally {
       if (action === 'recreate') {
         this.loadingRecreate = false;

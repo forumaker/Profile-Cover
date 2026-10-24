@@ -10,17 +10,17 @@ import CoverEditorModal from './components/CoverEditorModal';
 export { default as extend } from './extend';
 
 app.initializers.add('forumaker-profile-cover', () => {
-  extend(UserCard.prototype, 'view', function (view: Mithril.Vnode) {
+  extend(UserCard.prototype, 'view', function (this: any, view: Mithril.Vnode<any>) {
     if (!this.attrs.user.cover()) return;
 
-    const coverUrl     = this.attrs.user.cover();
+    const coverUrl = this.attrs.user.cover();
     const thumbnailUrl = this.attrs.user.cover_thumbnail();
 
     if (!coverUrl) return;
 
     const isProfilePage = app.current.matches(UserPage);
-    const imageUrl      = (!isProfilePage && thumbnailUrl) ? thumbnailUrl : coverUrl;
-    const position      = this.attrs.user.cover_position() ?? 50;
+    const imageUrl = !isProfilePage && thumbnailUrl ? thumbnailUrl : coverUrl;
+    const position = this.attrs.user.cover_position() ?? 50;
 
     view.attrs.style = Object.assign(view.attrs.style || {}, {
       '--background-image': `url(${imageUrl})`,
@@ -29,12 +29,12 @@ app.initializers.add('forumaker-profile-cover', () => {
   });
 
   if ('fof-blog' in flarum.extensions) {
-    extend('ext:fof/blog/forum/components/BlogItemSidebar/BlogAuthor', 'view', function (view: Mithril.Vnode) {
+    extend('ext:fof/blog/forum/components/BlogItemSidebar/BlogAuthor', 'view', function (this: any, view: Mithril.Vnode<any>) {
       const author = this.attrs.loading ? null : this.attrs.article ? this.attrs.article.user() : this.attrs.user;
 
       if (!author || !author.cover()) return;
 
-      const background = (view.children as Mithril.Vnode[])?.find(
+      const background = (view.children as Mithril.Vnode<any>[])?.find(
         (child) => typeof child?.attrs?.className === 'string' && child.attrs.className.includes('FoFBlog-Article-Author-background')
       );
 

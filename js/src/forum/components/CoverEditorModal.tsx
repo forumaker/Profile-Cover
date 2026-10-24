@@ -1,6 +1,7 @@
 import Form from 'flarum/common/components/Form';
 import app from 'flarum/forum/app';
-import Modal from 'flarum/common/components/Modal';
+import Modal, { IInternalModalAttrs } from 'flarum/common/components/Modal';
+import type User from 'flarum/common/models/User';
 import Button from 'flarum/common/components/Button';
 import ItemList from 'flarum/common/utils/ItemList';
 import LoadingIndicator from 'flarum/common/components/LoadingIndicator';
@@ -12,7 +13,11 @@ interface ApiPayload {
   included?: object[];
 }
 
-export default class CoverEditorModal extends Modal {
+interface CoverEditorModalAttrs extends IInternalModalAttrs {
+  user: User;
+}
+
+export default class CoverEditorModal extends Modal<CoverEditorModalAttrs> {
   maxSize!: number;
   alertAttrs!: { content: string; type?: string };
   loading!: boolean;
@@ -26,12 +31,12 @@ export default class CoverEditorModal extends Modal {
   oninit(vnode: Mithril.Vnode<this>) {
     super.oninit(vnode);
 
-    this.maxSize = parseFloat(app.forum.attribute('forumaker-profile-cover.max_size') || 2048);
+    this.maxSize = parseFloat(String(app.forum.attribute('forumaker-profile-cover.max_size') || 2048));
 
     this.alertAttrs = {
       content: app.translator.trans('forumaker-profile-cover.forum.notice', {
         size: formatBytes(this.maxSize * Math.pow(2, 10)),
-      }) as string,
+      }) as unknown as string,
     };
 
     this.loading = false;
@@ -56,7 +61,9 @@ export default class CoverEditorModal extends Modal {
         type="file"
         accept="image/jpeg,image/png,image/gif,image/bmp,image/webp"
         style="display:none"
-        oncreate={(vnode: Mithril.Vnode<this>) => { this.fileInputRef = vnode.dom as HTMLInputElement; }}
+        oncreate={(vnode: Mithril.VnodeDOM<any, any>) => {
+          this.fileInputRef = vnode.dom as HTMLInputElement;
+        }}
         onchange={(e: Event) => {
           const files = (e.target as HTMLInputElement).files;
           if (files?.[0]) this.upload(files[0]);
@@ -166,7 +173,7 @@ export default class CoverEditorModal extends Modal {
     m.redraw();
 
     app
-      .request({
+      .request<ApiPayload>({
         method: 'POST',
         url: `${app.forum.attribute('apiUrl')}/users/${this.attrs.user.id()}/cover`,
         serialize: (raw: any) => raw,
@@ -205,7 +212,7 @@ export default class CoverEditorModal extends Modal {
     m.redraw();
 
     app
-      .request({
+      .request<ApiPayload>({
         method: 'DELETE',
         url: `${app.forum.attribute('apiUrl')}/users/${this.attrs.user.id()}/cover`,
       })
@@ -213,7 +220,7 @@ export default class CoverEditorModal extends Modal {
   }
 
   success(response: ApiPayload) {
-    app.store.pushPayload(response);
+    app.store.pushPayload(response as any);
     this.showAlert('success');
     this.loading = false;
     m.redraw();
