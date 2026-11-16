@@ -12,6 +12,7 @@ use Flarum\Foundation\DispatchEventsTrait;
 use Flarum\User\UserRepository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Intervention\Image\ImageManager;
+use Intervention\Image\Interfaces\ImageInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mime\MimeTypes;
 
@@ -41,7 +42,9 @@ class UploadCoverHandler
         $filePath = $command->file->getStream()->getMetadata('uri');
         $mimeType = (new MimeTypes())->guessMimeType($filePath);
 
-        if ($mimeType === 'image/gif') {
+        $isGif = $mimeType === 'image/gif';
+
+        if ($isGif && $command->crop === null) {
             $this->uploader->uploadGif($user, $command->file);
         } else {
             $this->assertDimensionsWithinLimit($filePath);
@@ -49,11 +52,18 @@ class UploadCoverHandler
             try {
                 $image = $this->imageManager->read($filePath);
 
+                if ($command->crop !== null) {
+                    $this->crop($image, $command->crop);
+                }
+
                 $this->events->dispatch(
                     new CoverSaving($user, $actor, $image)
                 );
 
-                $this->uploader->upload($user, $image);
+                $this->uploader->upload($user, $image, $isGif);
+                if ($command->crop !== null) {
+                    $user->cover_position = 50;
+                }
             } catch (\Intervention\Image\Exceptions\DecoderException $e) {
                 throw new ValidationException(['cover' => ['The uploaded image file is corrupted or unreadable.']]);
             } catch (ValidationException $e) {
@@ -70,6 +80,27 @@ class UploadCoverHandler
         $this->dispatchEventsFor($user, $actor);
 
         return $user;
+    }
+
+    private function crop(ImageInterface $image, string $value): void
+    {
+        $area = json_decode($value, true, 4);
+        if (is_array($area)) {
+            $x = $area['x'] ?? null;
+            $y = $area['y'] ?? null;
+            $width = $area['width'] ?? null;
+            $height = $area['height'] ?? null;
+
+            if (is_int($x) && is_int($y) && is_int($width) && is_int($height)
+                && $x >= 0 && $y >= 0 && $width > 0 && $height > 0
+                && $width <= $image->width() - $x && $height <= $image->height() - $y) {
+                $image->crop($width, $height, $x, $y, 'transparent');
+
+                return;
+            }
+        }
+
+        throw new ValidationException(['cover' => ['Invalid crop area.']]);
     }
 
     /**

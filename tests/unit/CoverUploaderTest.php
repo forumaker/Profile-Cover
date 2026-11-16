@@ -77,7 +77,7 @@ class CoverUploaderTest extends TestCase
         return new CoverUploader($factory, $settingsRepo);
     }
 
-    /** A small solid-color image, cheap to generate and to JPEG-encode. */
+    /** A small solid-color image, cheap to generate and to encode. */
     private function testImage(int $width = 100, int $height = 80): \Intervention\Image\Image
     {
         return ImageManager::gd()->create($width, $height);
@@ -92,7 +92,7 @@ class CoverUploaderTest extends TestCase
 
     // ── upload() ─────────────────────────────────────────────────────────
 
-    public function test_upload_stores_a_jpg_and_sets_a_random_cover_path(): void
+    public function test_upload_stores_a_webp_and_sets_a_random_cover_path(): void
     {
         $disk = $this->filesystem();
         $uploader = $this->uploader($disk);
@@ -101,8 +101,8 @@ class CoverUploaderTest extends TestCase
         $uploader->upload($user, $this->testImage());
 
         $this->assertNotEmpty($user->cover);
-        $this->assertStringEndsWith('.jpg', $user->cover);
-        $this->assertTrue($disk->exists($user->cover));
+        $this->assertStringEndsWith('.webp', $user->cover);
+        $this->assertSame(IMAGETYPE_WEBP, getimagesizefromstring($disk->get($user->cover))[2]);
     }
 
     public function test_upload_does_not_create_a_thumbnail_when_disabled(): void
@@ -127,7 +127,7 @@ class CoverUploaderTest extends TestCase
 
         $uploader->upload($user, $this->testImage(200, 160));
 
-        $this->assertTrue($disk->exists('thumbnails/' . $user->cover));
+        $this->assertSame(IMAGETYPE_WEBP, getimagesizefromstring($disk->get('thumbnails/' . $user->cover))[2]);
     }
 
     /**

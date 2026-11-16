@@ -6,7 +6,6 @@ use Flarum\Api\Context;
 use Flarum\Api\Endpoint;
 use Flarum\Bus\Dispatcher;
 use Flarum\Foundation\ValidationException;
-use Illuminate\Support\Arr;
 use Forumaker\ProfileCover\Command\DeleteCover;
 use Forumaker\ProfileCover\Command\UploadCover;
 use Psr\Http\Message\UploadedFileInterface;
@@ -23,14 +22,19 @@ class UserResourceEndpoints
             Endpoint\Endpoint::make('cover.upload')
                 ->route('POST', '/{id}/cover')
                 ->action(function (Context $context) {
-                    $file = Arr::get($context->request->getUploadedFiles(), 'cover');
+                    $file = $context->request->getUploadedFiles()['cover'] ?? null;
 
                     if (!$file instanceof UploadedFileInterface) {
                         throw new ValidationException(['cover' => ['No file was uploaded.']]);
                     }
 
+                    $crop = $context->request->getParsedBody()['crop'] ?? null;
+                    if ($crop !== null && (!is_string($crop) || strlen($crop) > 128)) {
+                        throw new ValidationException(['cover' => ['Invalid crop area.']]);
+                    }
+
                     return $this->bus->dispatch(
-                        new UploadCover($context->modelId, $file, $context->getActor())
+                        new UploadCover($context->modelId, $file, $context->getActor(), $crop)
                     );
                 }),
             Endpoint\Endpoint::make('cover.delete')

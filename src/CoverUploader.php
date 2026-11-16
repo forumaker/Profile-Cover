@@ -3,7 +3,7 @@
 namespace Forumaker\ProfileCover;
 
 use Illuminate\Support\Str;
-use Intervention\Image\Image;
+use Intervention\Image\Interfaces\ImageInterface;
 use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Flarum\User\User;
@@ -19,36 +19,45 @@ class CoverUploader
         $this->coversDir = $filesystem->disk('forumaker-profile-cover');
     }
 
-    public function upload(User $user, Image $image): void
+    public function upload(User $user, ImageInterface $image, bool $gif = false): void
     {
-        $makeThumb = $this->config->get('forumaker-profile-cover.thumbnails', 0) == 1;
+        $makeThumb = !$gif && $this->config->get('forumaker-profile-cover.thumbnails', 0) == 1;
 
         if ($image->width() > 2500) {
             $image->scale(2500);
         }
 
-        $encodedImage = $image->toJpg();
-        $coverPath    = Str::random() . '.jpg';
+        $encodedImage = $gif ? $image->toGif() : $image->toWebp();
+        $coverPath    = Str::random() . ($gif ? '.gif' : '.webp');
+
+        if (!$this->coversDir->put($coverPath, $encodedImage)) {
+            throw new \RuntimeException('Could not save profile cover');
+        }
+
+        try {
+            if ($makeThumb) {
+                // 1px floor: Image::scale(0) throws, and an admin clearing or
+                // zeroing the setting would otherwise turn every upload into a
+                // failed one (see the matching floor in
+                // RecreateProfileCoverThumbnailsJob::handle()).
+                $thumbWidth    = max(1, (int) $this->config->get('forumaker-profile-cover.thumbnail_width', 500));
+                $thumbnail     = clone $image;
+                $thumbnailPath = 'thumbnails/' . $coverPath;
+
+                $thumbnail->scale($thumbWidth);
+                $encodedThumbnail = $thumbnail->toWebp();
+
+                if (!$this->coversDir->put($thumbnailPath, $encodedThumbnail)) {
+                    throw new \RuntimeException('Could not save profile cover thumbnail');
+                }
+            }
+        } catch (\Throwable $e) {
+            $this->coversDir->delete($coverPath);
+            throw $e;
+        }
 
         $this->remove($user);
         $user->cover = $coverPath;
-
-        if ($makeThumb) {
-            // 1px floor: Image::scale(0) throws, and an admin clearing or
-            // zeroing the setting would otherwise turn every upload into a
-            // failed one (see the matching floor in
-            // RecreateProfileCoverThumbnailsJob::handle()).
-            $thumbWidth    = max(1, (int) $this->config->get('forumaker-profile-cover.thumbnail_width', 500));
-            $thumbnail     = clone $image;
-            $thumbnailPath = 'thumbnails/' . $coverPath;
-
-            $thumbnail->scale($thumbWidth);
-            $encodedThumbnail = $thumbnail->toJpg();
-
-            $this->coversDir->put($thumbnailPath, $encodedThumbnail);
-        }
-
-        $this->coversDir->put($coverPath, $encodedImage);
     }
 
     public function uploadGif(User $user, UploadedFileInterface $file): void

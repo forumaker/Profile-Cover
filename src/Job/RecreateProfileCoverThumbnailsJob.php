@@ -66,7 +66,7 @@ class RecreateProfileCoverThumbnailsJob implements ShouldQueue
                         $image = $imageManager->read($data);
                         $image->scale($width);
 
-                        $coversDir->put('thumbnails/' . $coverPath, $image->toJpg());
+                        $coversDir->put('thumbnails/' . $coverPath, $image->encodeByPath($coverPath));
                     } catch (\Exception $e) {
                         $logger->error('forumaker-profile-cover: failed to recreate thumbnail for ' . $coverPath, [
                             'exception' => $e,

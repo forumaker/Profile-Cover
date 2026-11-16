@@ -10,7 +10,8 @@ class UploadCover
     public function __construct(
         public readonly int $userId,
         public readonly UploadedFileInterface $file,
-        public readonly User $actor
+        public readonly User $actor,
+        public readonly ?string $crop = null
     ) {
     }
 }
